@@ -48,14 +48,14 @@ public class TaxServer {
 
     private static boolean processSession(PrintWriter out, BufferedReader in, Socket clientSocket){
         try {
-            String input = in.readLine();
+            String input = ASCIItoString(in.readLine());
             String output = null;
             while (!input.matches("TAX")) {
-                out.println("Please create a new TAX session first");
-                input = in.readLine();
+                out.println(buildASCIIString("Please create a new TAX session first"));
+                input = ASCIItoString(in.readLine());
             }
-            out.println("TAX: OK");
-            input = in.readLine();
+            out.println(buildASCIIString("TAX: OK"));
+            input = ASCIItoString(in.readLine());
             //BYE and END will be esacaping variables
             while (!input.matches("END") && !input.matches("BYE")){
                 switch (input) {
@@ -70,18 +70,18 @@ public class TaxServer {
                             System.out.println("This is a number");
                         }
                         else if(input.matches("TAX")){
-                            out.println("Session already active");
+                            out.println(buildASCIIString("Session already active"));
                         }
                         else{
                             break;
                         }
                     }
                 }
-                input = in.readLine();
+                input = ASCIItoString(in.readLine());
                 System.out.println(input);
             }
             if(input.matches("END")){
-                out.println("END: OK");
+                out.println(buildASCIIString("END: OK"));
                 clientSocket.close();
                 out.close();
                 in.close();
@@ -98,6 +98,27 @@ public class TaxServer {
         }
         //redundant measure
         return false;
+    }
+
+    public static String buildASCIIString(String str){
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (int i = 0; i < str.length(); i++) {
+            stringBuilder.append((int) str.charAt(i));
+        }
+        return stringBuilder.toString();
+    }
+
+    private static String ASCIItoString(String ascii){
+        int num = 0;
+        String output = "";
+        for (int i = 0; i < ascii.length(); i++) {
+            num = num * 10 + (ascii.charAt(i) - '0');
+            if (num >= 32 && num <= 122) {
+                output = output + (char)num;
+                num = 0;
+            }
+        }
+        return output;
     }
 
 

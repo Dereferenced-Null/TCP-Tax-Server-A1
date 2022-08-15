@@ -20,7 +20,6 @@ public class TaxClient {
         ){
             String output = null;
             String input = null;
-            String numberRegex = "[0-9]+";
             do{
                 //I think maybe the point is more that the client puts whatever in and its just parsed, all the switch stuff may be unnecessary.
                 //Ask and then it can be removed if needed. Although that would require the client to know exactly what messages to send and when.
@@ -28,8 +27,8 @@ public class TaxClient {
                 switch (input){
                     case "TAX" : {
                         System.out.println("Tax");
-                        out.println(input);
-                        input = in.readLine();
+                        out.println(buildASCIIString("TAX"));
+                        input = ASCIItoString(in.readLine());
                         if(!input.matches("TAX: OK")){
                             System.out.println(input);
                             break;
@@ -49,8 +48,9 @@ public class TaxClient {
                         break;
                     }
                     case "END" : {
-                        out.println(input);
-                        //allow for server reply before exit
+                        out.println(buildASCIIString(input));
+                        //allow for server reply before exit,
+                        //input itself is technically irrelevant
                         in.readLine();
                         break;
                     }
@@ -75,5 +75,26 @@ public class TaxClient {
             System.out.println(e);
             e.printStackTrace();
         }
+    }
+
+    public static String buildASCIIString(String str){
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (int i = 0; i < str.length(); i++) {
+            stringBuilder.append((int) str.charAt(i));
+        }
+        return stringBuilder.toString();
+    }
+
+    private static String ASCIItoString(String ascii){
+        int num = 0;
+        String output = "";
+        for (int i = 0; i < ascii.length(); i++) {
+            num = num * 10 + (ascii.charAt(i) - '0');
+            if (num >= 32 && num <= 122) {
+                output = output + (char)num;
+                num = 0;
+            }
+        }
+        return output;
     }
 }
