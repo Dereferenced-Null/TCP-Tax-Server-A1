@@ -20,23 +20,25 @@ public class TaxClient {
         ){
             String output = null;
             String input = null;
+            out.println(buildASCIIString("TAX") + "\n");
+            input = ASCIItoString(in.readLine());
+            if(!input.matches("TAX: OK")){
+                System.out.println(input);
+            }
             do{
                 //I think maybe the point is more that the client puts whatever in and its just parsed, all the switch stuff may be unnecessary.
                 //Ask and then it can be removed if needed. Although that would require the client to know exactly what messages to send and when.
                 input = clientIn.readLine();
                 switch (input){
-                    case "TAX" : {
-                        System.out.println("Tax");
-                        out.println(buildASCIIString("TAX"));
-                        input = ASCIItoString(in.readLine());
-                        if(!input.matches("TAX: OK")){
-                            System.out.println(input);
-                            break;
-                        }
-                        break;
-                    }
                     case "STORE" : {
-                        System.out.println("Store");
+                        out.println(buildASCIIString("STORE"));
+                        //Four messages out
+                        for (int i = 0; i < 4; i++){
+                            input = buildASCIIString(clientIn.readLine());
+                            out.println(input);
+                        }
+                        System.out.println("DONE");
+                        input = ASCIItoString(in.readLine());
                         break;
                     }
                     case "QUERY" : {
@@ -77,6 +79,7 @@ public class TaxClient {
         }
     }
 
+    //Builds an outgoing ASCII string to be sent
     public static String buildASCIIString(String str){
         StringBuilder stringBuilder = new StringBuilder("");
         for (int i = 0; i < str.length(); i++) {
@@ -85,6 +88,8 @@ public class TaxClient {
         return stringBuilder.toString();
     }
 
+
+    //Converts the incoming ASCII string into a java string, note ignores endline values, may need to be re-added
     private static String ASCIItoString(String ascii){
         int num = 0;
         String output = "";
