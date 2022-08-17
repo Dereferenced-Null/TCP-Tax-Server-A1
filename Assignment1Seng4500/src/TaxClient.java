@@ -37,8 +37,8 @@ public class TaxClient {
                             input = buildASCIIString(clientIn.readLine());
                             out.println(input);
                         }
-                        System.out.println("DONE");
                         input = ASCIItoString(in.readLine());
+                        System.out.println(input);
                         break;
                     }
                     case "QUERY" : {
