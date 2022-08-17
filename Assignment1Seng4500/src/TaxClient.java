@@ -20,9 +20,9 @@ public class TaxClient {
         ){
             String output = null;
             String input = null;
-            out.println(buildASCIIString("TAX") + "\n");
+            out.println(buildASCIIString("TAX"));
             input = ASCIItoString(in.readLine());
-            if(!input.matches("TAX: OK")){
+            if(input.matches("TAX: OK")){
                 System.out.println(input);
             }
             do{

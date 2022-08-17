@@ -3,8 +3,6 @@ import java.net.*;
 
 public class TaxServer {
 
-    private double [][] taxMatrix = new double [10][4];
-
     public static void main(String []args){
         int port = 8000;
         //for creating new sessions
@@ -37,7 +35,8 @@ public class TaxServer {
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         ){
-             activeSession = processSession(out, in, clientSocket);
+            int[][] taxMatrix = new int [10][4];
+            activeSession = processSession(out, in, clientSocket, taxMatrix);
         }
         catch(Exception e){
             System.out.println(e);
@@ -46,43 +45,36 @@ public class TaxServer {
         return activeSession;
     }
 
-    private static boolean processSession(PrintWriter out, BufferedReader in, Socket clientSocket){
+    private static boolean processSession(PrintWriter out, BufferedReader in, Socket clientSocket, int[][] taxMatrix){
         try {
             String input = ASCIItoString(in.readLine());
-            String output = null;
-            while (!input.matches("TAX")) {
-                out.println(buildASCIIString("AN ERROR HAS OCCURED: Please create a new TAX session first"));
-                input = ASCIItoString(in.readLine());
-            }
+            System.out.println(input);
             out.println(buildASCIIString("TAX: OK"));
             input = ASCIItoString(in.readLine());
             //server actions that don't include shutdown of the server
             while (!input.matches("END") && !input.matches("BYE")){
+                if(input == "STORE"){
+                    System.out.println(input);
+                }
                 switch (input) {
                     case "STORE" : {
+                        int [] incomingTaxValues = new int[4];
                         //Recieve 4 messages
-                        input = ASCIItoString(in.readLine());
-                        int startIncome = Integer.parseInt(input);
-                        input = ASCIItoString(in.readLine());
-                        int endIncome = Integer.parseInt(input);
-                        input = ASCIItoString(in.readLine());
-                        int baseTax = Integer.parseInt(input);
-                        input = ASCIItoString(in.readLine());
-                        int percentOnDollar = Integer.parseInt(input);
-                        System.out.println(startIncome);
-                        System.out.println(endIncome);
-                        System.out.println(baseTax);
-                        System.out.println(percentOnDollar);
-                        if(startIncome > endIncome){
-                            //this means the input is wrong, error out
+                        System.out.println("STORE!");
+                        for(int i = 0; i < 4; i ++){
+                            incomingTaxValues[i] = Integer.parseInt(ASCIItoString(in.readLine()));
                         }
+                        if(incomingTaxValues[1] > incomingTaxValues[0]){
+                            out.print("STORE: FAILED: check values");
+                        }
+                        storeTaxValues(taxMatrix, incomingTaxValues);
 
                         //store the values based on size, can just check the first and second values in the matrix
                         //array must be sorted, but creating a sorting on insertion function should be enough
                         //This function will have
-                        out.println(buildASCIIString("STORE: OK"));
+                        out.print(buildASCIIString("STORE: OK"));
 
-
+                        break;
                         //these values can be stored in the matrix but will need to be stored in order
                         //for ease of access
                     }
@@ -99,6 +91,7 @@ public class TaxServer {
                     }
                 }
                 input = ASCIItoString(in.readLine());
+                in.readLine();
             }
             if(input.matches("END")){
                 out.println(buildASCIIString("END: OK"));
@@ -143,6 +136,15 @@ public class TaxServer {
             }
         }
         return output;
+    }
+
+    private static void storeTaxValues(int[][] taxMatrix, int [] taxValues){
+            int i = 0;
+            for(int taxValue: taxValues){
+                taxMatrix [0][i] = taxValue;
+                i++;
+            }
+        System.out.println(taxMatrix[0][1]);
     }
 
 
