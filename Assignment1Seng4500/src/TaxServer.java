@@ -50,12 +50,9 @@ public class TaxServer {
             String input = ASCIItoString(in.readLine());
             System.out.println(input);
             out.println(buildASCIIString("TAX: OK"));
-            input = ASCIItoString(in.readLine());
             //server actions that don't include shutdown of the server
             while (!input.matches("END") && !input.matches("BYE")){
-                if(input == "STORE"){
-                    System.out.println(input);
-                }
+                input = ASCIItoString(in.readLine());
                 switch (input) {
                     case "STORE" : {
                         int [] incomingTaxValues = new int[4];
@@ -64,7 +61,7 @@ public class TaxServer {
                         for(int i = 0; i < 4; i ++){
                             incomingTaxValues[i] = Integer.parseInt(ASCIItoString(in.readLine()));
                         }
-                        if(incomingTaxValues[1] > incomingTaxValues[0]){
+                        if(incomingTaxValues[1] < incomingTaxValues[0]){
                             out.print("STORE: FAILED: check values");
                         }
                         storeTaxValues(taxMatrix, incomingTaxValues);
@@ -72,26 +69,23 @@ public class TaxServer {
                         //store the values based on size, can just check the first and second values in the matrix
                         //array must be sorted, but creating a sorting on insertion function should be enough
                         //This function will have
-                        out.print(buildASCIIString("STORE: OK"));
-
+                        out.println(buildASCIIString("STORE: OK"));
                         break;
-                        //these values can be stored in the matrix but will need to be stored in order
-                        //for ease of access
                     }
                     case "QUERY" : {
                         //handle query protocol
+                        break;
                     }
                     default : {
                         if(input.matches("[0-9]+")){
                             System.out.println("This is a number");
+                            break;
                         }
                         else{
                             break;
                         }
                     }
                 }
-                input = ASCIItoString(in.readLine());
-                in.readLine();
             }
             if(input.matches("END")){
                 out.println(buildASCIIString("END: OK"));
@@ -139,13 +133,16 @@ public class TaxServer {
     }
 
     private static void storeTaxValues(int[][] taxMatrix, int [] taxValues){
+        if(taxMatrix[0][0] == 0){
             int i = 0;
             for(int taxValue: taxValues){
                 taxMatrix [0][i] = taxValue;
                 i++;
             }
-        System.out.println(taxMatrix[0][1]);
+        }
+        else{
+            //Sort
+        }
     }
-
 
 }
