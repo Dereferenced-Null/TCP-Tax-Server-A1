@@ -48,6 +48,7 @@ public class TaxServer {
     private static boolean processSession(PrintWriter out, BufferedReader in, Socket clientSocket, int[][] taxMatrix){
         try {
             String input = ASCIItoString(in.readLine());
+            System.out.println(input);
             out.println(buildASCIIString("TAX: OK"));
             input = ASCIItoString(in.readLine());
             //server actions that don't include shutdown of the server
@@ -60,21 +61,18 @@ public class TaxServer {
                         int [] incomingTaxValues = new int[4];
                         //Recieve 4 messages
                         System.out.println("STORE!");
-                        input = ASCIItoString(in.readLine());
-                        System.out.println(input);
                         for(int i = 0; i < 4; i ++){
-
+                            incomingTaxValues[i] = Integer.parseInt(ASCIItoString(in.readLine()));
                         }
-//                        incomingTaxValues[0] = Integer.parseInt(ASCIItoString(in.readLine()));
-                        if(incomingTaxValues[1] < incomingTaxValues[0]){
-                            out.print(buildASCIIString("STORE: FAILED: check values"));
+                        if(incomingTaxValues[1] > incomingTaxValues[0]){
+                            out.print("STORE: FAILED: check values");
                         }
                         storeTaxValues(taxMatrix, incomingTaxValues);
 
                         //store the values based on size, can just check the first and second values in the matrix
                         //array must be sorted, but creating a sorting on insertion function should be enough
                         //This function will have
-                        out.println(buildASCIIString("STORE: OK"));
+                        out.print(buildASCIIString("STORE: OK"));
 
                         break;
                         //these values can be stored in the matrix but will need to be stored in order

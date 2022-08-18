@@ -1,7 +1,6 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class TaxClient {
 
@@ -16,31 +15,30 @@ public class TaxClient {
             Socket socket = new Socket(hostname, port);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            Scanner console = new Scanner(System.in);
+            InputStreamReader clientInput = new InputStreamReader(System.in);
+            BufferedReader clientIn = new BufferedReader(clientInput);
         ){
             String output = null;
-            String serverInput = null;
-            String userInput = null;
+            String input = null;
             out.println(buildASCIIString("TAX"));
-            ASCIItoString(in.readLine());
+            input = ASCIItoString(in.readLine());
+            if(input.matches("TAX: OK")){
+                System.out.println(input);
+            }
             do{
-                userInput = console.nextLine();
-                console.nextLine();
-                switch (userInput){
+                //I think maybe the point is more that the client puts whatever in and its just parsed, all the switch stuff may be unnecessary.
+                //Ask and then it can be removed if needed. Although that would require the client to know exactly what messages to send and when.
+                input = clientIn.readLine();
+                switch (input){
                     case "STORE" : {
                         out.println(buildASCIIString("STORE"));
-                        output = "";
                         //Four messages out
-                        for (int i = 0; i < 4;){
-                            userInput = console.nextLine();
-                            System.out.println("THIS IS THE INPUT:" + userInput);
-                            output = output + buildASCIIString(userInput);
-                            i++;
+                        for (int i = 0; i < 4; i++){
+                            input = buildASCIIString(clientIn.readLine());
+                            out.println(input);
                         }
-                        System.out.println(output);
-                        out.println(output);
-                        userInput = ASCIItoString(in.readLine());
-                        System.out.println(userInput);
+                        input = ASCIItoString(in.readLine());
+                        System.out.println(input);
                         break;
                     }
                     case "QUERY" : {
@@ -52,14 +50,14 @@ public class TaxClient {
                         break;
                     }
                     case "END" : {
-                        out.println(buildASCIIString("END"));
+                        out.println(buildASCIIString(input));
                         //allow for server reply before exit,
                         //input itself is technically irrelevant
                         in.readLine();
                         break;
                     }
                     default: {
-                        if(userInput.matches("[0-9]+")){
+                        if(input.matches("[0-9]+")){
                             System.out.println("This is a number");
                             break;
                         }
@@ -67,11 +65,12 @@ public class TaxClient {
                 }
 
             }
-            while(!userInput.matches("END"));
+            while(!input.matches("END"));
             socket.close();
             out.close();
             in.close();
-            console.close();
+            clientIn.close();
+            clientInput.close();
             System.out.println("Complete");
         }
         catch(Exception e){
