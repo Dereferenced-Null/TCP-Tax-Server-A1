@@ -18,16 +18,15 @@ public class TaxClient {
             InputStreamReader clientInput = new InputStreamReader(System.in);
             BufferedReader clientIn = new BufferedReader(clientInput);
         ){
+            boolean exitFlag = false;
             String output = null;
             String input = null;
             out.println(buildASCIIString("TAX"));
             input = ASCIItoString(in.readLine());
-            if(input.matches("TAX: OK")){
-                System.out.println(input);
-            }
+            System.out.println(input);
+            //main loop
+            //Note: System output for store and query are disabled as they are not explicitly required in the spec
             do{
-                //I think maybe the point is more that the client puts whatever in and its just parsed, all the switch stuff may be unnecessary.
-                //Ask and then it can be removed if needed. Although that would require the client to know exactly what messages to send and when.
                 input = clientIn.readLine();
                 switch (input){
                     case "STORE" : {
@@ -38,40 +37,52 @@ public class TaxClient {
                             out.println(input);
                         }
                         input = ASCIItoString(in.readLine());
-                        System.out.println(input);
+//                        System.out.println(input);
                         break;
                     }
                     case "QUERY" : {
-                        System.out.println("Query");
+                        out.println(buildASCIIString("QUERY"));
+                        do{
+                            input = ASCIItoString(in.readLine());
+//                            System.out.println(input);
+                        }
+                        while(!input.matches("QUERY: OK"));
                         break;
                     }
                     case "BYE" : {
-                        System.out.println("Bye");
+                        out.println(buildASCIIString("BYE"));
+                        input = ASCIItoString(in.readLine());
+                        System.out.println(input);
+                        exitFlag = true;
                         break;
                     }
                     case "END" : {
                         out.println(buildASCIIString(input));
                         //allow for server reply before exit,
                         //input itself is technically irrelevant
-                        in.readLine();
+                        input = ASCIItoString(in.readLine());
+                        System.out.println(input);
+                        exitFlag = true;
                         break;
                     }
                     default: {
                         if(input.matches("[0-9]+")){
-                            System.out.println("This is a number");
+                            out.println(buildASCIIString(input));
+                            input = ASCIItoString(in.readLine());
+                            System.out.println(input);
                             break;
                         }
+                        //this default also means that incorrect user input will not be sent.
                     }
                 }
 
             }
-            while(!input.matches("END"));
+            while(!exitFlag);
             socket.close();
             out.close();
             in.close();
             clientIn.close();
             clientInput.close();
-            System.out.println("Complete");
         }
         catch(Exception e){
             System.out.println(e);
@@ -95,7 +106,7 @@ public class TaxClient {
         String output = "";
         for (int i = 0; i < ascii.length(); i++) {
             num = num * 10 + (ascii.charAt(i) - '0');
-            if (num >= 32 && num <= 122) {
+            if (num >= 32 && num <= 126) {
                 output = output + (char)num;
                 num = 0;
             }
